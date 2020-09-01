@@ -1,4 +1,12 @@
 FROM centos:7
+ARG USER=opentext
+ARG UID=1000
+ARG GID=1000
+# default password for user
+ARG PW=opentext
+RUN useradd -m ${USER} --uid=${UID} && echo "${USER}:${PW}" | \
+      chpasswd
+
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
@@ -16,7 +24,16 @@ RUN set -eux; \
     mkdir -p /opentext/adoptopenjdk/jdk8; \
     cd /opentext/adoptopenjdk/jdk8; \
     tar -xf /tmp/openjdk.tar.gz --strip-components=1; \
-    rm -rf /tmp/openjdk.tar.gz;
+    rm -rf /tmp/openjdk.tar.gz; \
+    mkdir -p /opentext/distrib;
+
+
+COPY opentext_portal_for_unix.bin /opentext/distrib/
+RUN chmod 770 /opentext/distrib/opentext_portal_for_unix.bin
+
+RUN chown -R ${USER} /opentext;
+
+USER ${UID}:${GID}
 
 ENV JAVA_HOME=/opentext/adoptopenjdk/jdk8 \
     PATH="/opentext/adoptopenjdk/jdk8/bin:$PATH"
