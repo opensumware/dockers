@@ -1,4 +1,5 @@
 FROM centos:7
+ARG STAGE_NAME="Mgmt"
 ARG USER=opentext
 ARG UID=1000
 ARG GID=1000
@@ -31,9 +32,9 @@ RUN set -eux; \
 
 ENV JAVA_HOME=/opentext/adoptopenjdk/jdk8 \
     PATH="/opentext/adoptopenjdk/jdk8/bin:$PATH"
-    
+
 # Tomcat
-ENV CATALINA_HOME /usr/local/tomcat
+ENV CATALINA_HOME /opentext/apache/tomcat/${STAGE_NAME}
 ENV PATH $CATALINA_HOME/bin:$PATH
 RUN mkdir -p "$CATALINA_HOME"
 WORKDIR $CATALINA_HOME
@@ -184,6 +185,6 @@ RUN chown -R ${USER} /opentext;
 
 USER ${UID}:${GID}
 
-
-
 EXPOSE 8080
+
+CMD ["catalina.sh", "run"]
